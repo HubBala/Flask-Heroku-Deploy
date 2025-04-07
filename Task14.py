@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request
-import joblib  # To load the trained model
+import joblib 
 import numpy as np
 
 app = Flask(__name__)
 
-# Load the trained model
-model = joblib.load("diagnostic_model.pkl")  # Ensure you have a saved model
+# Loading the trained model
+model = joblib.load("diagnostic_model.pkl") 
 
-@app.route('/')
+@app.route('/') # base route 
 def home():
     return render_template('index.html')
 
@@ -29,9 +29,10 @@ def predict():
             float(request.form['slope']),
             float(request.form['vessels_colored_by_flourosopy']),
             float(request.form['thalassemia'])
+
         ]
         
-        # Convert to NumPy array for model input
+        # for model input
         features_array = np.array([features])
         
         # Make prediction
@@ -39,7 +40,7 @@ def predict():
         result = "High Risk" if prediction[0] == 1 else "Low Risk"
         
         return render_template('index.html', prediction_text=f'Prediction: {result}')
-    except Exception as e:
+    except Exception as e: # error handling or 
         return render_template('index.html', prediction_text=f'Error: {str(e)}')
 
 if __name__ == '__main__':

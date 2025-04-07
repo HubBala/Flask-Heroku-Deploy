@@ -72,3 +72,4 @@ plt.show()
 
 import joblib
 joblib.dump(rf_classifier, 'diagnostic_model.pkl')
+
