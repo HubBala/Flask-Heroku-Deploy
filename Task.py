@@ -17,3 +17,5 @@ print(df.tail(5))
 print(df.sample(10))
 df.to_csv("cleaned_lung_cancer_data.csv", index=False)
 print("THE DATASET IS CLEANED")
+
+

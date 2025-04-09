@@ -36,7 +36,7 @@ def predict():
         
         # Make prediction
         prediction = model.predict(features_array)
-        result = "High Risk" if prediction[0] == 1 else "Low Risk"
+        result = "High Risk of Heart Disease" if prediction[0] == 1 else "Low Risk of Heart Disease"
         
         return render_template('index.html', prediction_text=f'Prediction: {result}')
     except Exception as e:
