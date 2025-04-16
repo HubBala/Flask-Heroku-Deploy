@@ -1,3 +1,5 @@
+# Task9 - API 
+
 from flask import Flask, render_template, request
 import joblib  # To load the trained model
 import numpy as np
@@ -7,11 +9,11 @@ app = Flask(__name__)
 # Load the trained model
 model = joblib.load("diagnostic_model.pkl")  # Ensure you have a saved model
 
-@app.route('/')
+@app.route('/') # base root for the url
 def home():
     return render_template('index.html')
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['POST']) #  the root for index 
 def predict():
     try:
         # Extract user inputs from form
@@ -38,7 +40,7 @@ def predict():
         prediction = model.predict(features_array)
         result = "High Risk of Heart Disease" if prediction[0] == 1 else "Low Risk of Heart Disease"
         
-        return render_template('index.html', prediction_text=f'Prediction: {result}')
+        return render_template('index.html', prediction_text=f'Prediction: {result}') # gives the result to the UI
     except Exception as e:
         return render_template('index.html', prediction_text=f'Error: {str(e)}')
 

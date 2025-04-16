@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 import spacy
-
 app = Flask(__name__)
 
 # Load SciSpaCy model

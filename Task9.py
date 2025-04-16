@@ -1,3 +1,5 @@
+# Task9 - for decision tree and random forest
+
 import pandas as pd 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -9,8 +11,8 @@ import matplotlib.pyplot as plt
 
 
 df = pd.read_csv('HeartDiseaseTrain-Test.csv')
-df.info()
-print(df.head())
+# df.info()
+# print(df.head())
 
 df["sex"] = df["sex"].map({"Male": 1, "Female": 0})
 df["fasting_blood_sugar"]= df["fasting_blood_sugar"].map({"Lower than 120 mg/ml": 0, "Greater than 120 mg/ml": 1 })
@@ -22,7 +24,7 @@ df["slope"] = df["slope"].astype("category").cat.codes
 df["thalassemia"] = df["thalassemia"].astype("category").cat.codes
 df["vessels_colored_by_flourosopy"] = df["vessels_colored_by_flourosopy"].astype("category").cat.codes
 
-# features and target
+# features and target split 
 X = df[['age', 'sex', 'chest_pain_type', 'resting_blood_pressure', 'cholestoral', 'fasting_blood_sugar',
         'rest_ecg', 'Max_heart_rate', 'exercise_induced_angina', 'oldpeak', 'slope', 'vessels_colored_by_flourosopy', 
         'thalassemia']]
@@ -31,6 +33,7 @@ y = df['target']
 
 #df.info()
 
+# train and test 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
 
 # Random forest 
@@ -57,7 +60,7 @@ print(f"RandomForest Accuracy:", rf_accuracy)
 models = ['Decision Tree', 'Random Forest']
 accuracies = [0.824, 0.985]  # Convert percentages to decimal
 
-# Plot
+# Bar Plot 
 plt.figure(figsize=(6,4))
 plt.bar(models, accuracies, color=['blue', 'green'])
 plt.ylim(0.8, 1.0)  # limits 
@@ -70,6 +73,7 @@ plt.title('Model Accuracy Comparison of RandomForest vs DecisionTree')
 '''
 plt.show()
 
+# saving the model random forest
 import joblib
 joblib.dump(rf_classifier, 'diagnostic_model.pkl')
 

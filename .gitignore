@@ -2,6 +2,7 @@
 env/
 venv/
 .myvenv/
+myvenv1/
 *.env
 *.venv
 
