@@ -34,7 +34,7 @@ if uploaded_file is not None:
         prediction = model.predict(img_array)[0][0]
         st.write("Raw Prediction:", prediction)
 
-        # Show result
+        # Show result 
         if prediction > 0.5:
             st.success("Prediction: Normal")
         else:
