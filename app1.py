@@ -1,5 +1,5 @@
 # Task9 - API 
-
+import os
 from flask import Flask, render_template, request
 import joblib  # To load the trained model
 import numpy as np
@@ -45,4 +45,4 @@ def predict():
         return render_template('index.html', prediction_text=f'Error: {str(e)}')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
