@@ -71,3 +71,4 @@ for model_name, metrics in results.items():
     print(f"Confusion Matrix:\n{metrics['Confusion Matrix']}")
 
 
+df.to_csv("new_diabetes_dataset.csv", index=False)
