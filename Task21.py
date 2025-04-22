@@ -25,6 +25,7 @@ df[cols_with_zero_invalid] = df[cols_with_zero_invalid].replace(0, np.nan)
 imputer = SimpleImputer(strategy="mean")
 df[cols_with_zero_invalid] = imputer.fit_transform(df[cols_with_zero_invalid])
 
+
 # feature and target  
 X = df.drop('Outcome', axis=1)
 y = df['Outcome']
