@@ -1,101 +1,96 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import random
-import gym
-from gym import spaces
 from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+import pickle
+from sklearn.impute import SimpleImputer
 
-# 1. Load and scale the data
+# Load dataset
 df = pd.read_csv("Diabetes dataset.csv")
-features = df.drop(columns=['Outcome']).values
-labels = df['Outcome'].values 
+# columns with invalid Zeroes
+cols_with_zero_invalid = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']
+df[cols_with_zero_invalid] = df[cols_with_zero_invalid].replace(0, np.nan)
+# 0s with mean vbalues 
+imputer = SimpleImputer(strategy="mean")
+df[cols_with_zero_invalid] = imputer.fit_transform(df[cols_with_zero_invalid])
 
-# standardization 
+features = df.drop(columns=["Outcome"]).values
+labels = df["Outcome"].values
+
+# Normalize data
 scaler = StandardScaler()
-features = scaler.fit_transform(features)
+features_scaled = scaler.fit_transform(features)
 
-# Discretize the features
-def discretize_state(state, bins):
-    """Convert continuous state into a discrete tuple."""
-    state_disc = []
-    for i in range(len(state)):
-        state_disc.append(np.digitize(state[i], bins[i]))
-    return tuple(state_disc)
+# Cluster into states using KMeans (you can adjust n_clusters)
+kmeans = KMeans(n_clusters=100, random_state=42)
+states = kmeans.fit_predict(features_scaled)
 
-# Create bins for discretization
-n_bins = 8  
-bins = [np.linspace(-3, 3, n_bins) for _ in range(features.shape[1])]
+# Save the scaler and kmeans for later use
+with open("scaler.pkl", "wb") as f:
+    pickle.dump(scaler, f)
+    
+with open("kmeans.pkl", "wb") as f:
+    pickle.dump(kmeans, f)
 
-# 3. Custom Gym Environment
-class DiabetesEnv(gym.Env):
-    def __init__(self, features, labels):
-        super(DiabetesEnv, self).__init__()
-        self.features = features
-        self.labels = labels
-        self.index = 0
-        self.state = None
-        self.action_space = spaces.Discrete(3)  # Diet, Medication, Exercise
-        self.observation_space = spaces.Box(low=-3, high=3, shape=(features.shape[1],), dtype=np.float32)
+# Define treatment actions
+actions = ["Diet", "Medication", "Exercise"]
+n_actions = len(actions)
 
-    def reset(self):
-        self.index = random.randint(0, len(self.features) - 1)
-        self.state = self.features[self.index]
-        return self.state
+# Q-table: [state x actions]
+q_table = np.zeros((100, n_actions))
 
-    def step(self, action):
-        original_risk = self.labels[self.index]
-        success_probs = [0.4, 0.6, 0.5]
-        improved = np.random.rand() < success_probs[action]
-        reward = 100 if (improved and original_risk == 1) else (10 if improved else -10)
-        done = True
-        return self.state, reward, done, {}
+# RL hyperparameters
+alpha = 0.1        # Learning rate
+gamma = 0.9        # Discount factor
+epsilon = 1.0      # Exploration rate
+epsilon_decay = 0.995
+min_epsilon = 0.1
+episodes = 500
 
-# 4. Q-Learning Agent
-env = DiabetesEnv(features, labels)
-q_table = {}
+# Reward function based on action success
+def calculate_reward(label, action):
+    success_probs = [0.4, 0.6, 0.5]  # diet, medication, exercise success probabilities
+    success = np.random.rand() < success_probs[action]
+    if success and label == 1:  # Correct treatment for positive label
+        return 100
+    elif success:  # Correct treatment for negative label
+        return 10
+    else:  # Incorrect treatment
+        return -10
 
-alpha = 0.1
-gamma = 0.99
-epsilon = 1.0
-epsilon_decay = 0.999
-epsilon_min = 0.1
-episodes = 5000
-
-rewards_history = []
-
+# Training loop
 for episode in range(episodes):
-    state = env.reset()
-    state_disc = discretize_state(state, bins)
     total_reward = 0
+    for i in range(len(features_scaled)):
+        state = states[i]  # Using KMeans clusters as states
+        
+        # Exploration or Exploitation
+        if np.random.rand() < epsilon:
+            action = np.random.randint(n_actions)  # Random action (exploration)
+        else:
+            action = np.argmax(q_table[state])  # Best action (exploitation)
+        
+        # Calculate reward based on action and label
+        reward = calculate_reward(labels[i], action)
+        next_state = state  # For one-step episodes, next state is the same as current state
+        
+        # Update Q-table using Q-learning update rule
+        q_table[state, action] = q_table[state, action] + alpha * (
+            reward + gamma * np.max(q_table[next_state]) - q_table[state, action]
+        )
+        
+        total_reward += reward
 
-    if state_disc not in q_table:
-        q_table[state_disc] = np.zeros(env.action_space.n)
+    # Decay epsilon to reduce exploration over time
+    epsilon = max(min_epsilon, epsilon * epsilon_decay)
 
-    if np.random.rand() < epsilon:
-        action = np.random.randint(env.action_space.n)
-    else:
-        action = np.argmax(q_table[state_disc])
+    # Optionally, print the total reward of each episode for debugging
+    if episode % 50 == 0:  # Print every 50 episodes
+        print(f"Episode {episode}, Total Reward: {total_reward}")
 
-    next_state, reward, done, _ = env.step(action)
-    next_state_disc = discretize_state(next_state, bins)
+# Save the Q-learning model (Q-table)
+with open("q_table.pkl", "wb") as f:
+    pickle.dump(q_table, f)
 
-    if next_state_disc not in q_table:
-        q_table[next_state_disc] = np.zeros(env.action_space.n)
-
-    best_next_q = np.max(q_table[next_state_disc])
-    q_table[state_disc][action] += alpha * (reward + gamma * best_next_q - q_table[state_disc][action])
-
-    rewards_history.append(reward)
-    epsilon = max(epsilon_min, epsilon * epsilon_decay)
-
-# 5. Example: Print average reward
-print("Average Reward over last 100 episodes:", np.mean(rewards_history[-100:]))
-
-import matplotlib.pyplot as plt
-
-plt.plot(rewards_history)
-plt.xlabel("Episode")
-plt.ylabel("Reward")
-plt.title("Reward Over Episodes")
-plt.grid(True)
-plt.show()
+print("Training complete.")
