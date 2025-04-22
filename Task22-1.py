@@ -3,9 +3,18 @@ import pandas as pd
 import random
 from sklearn.preprocessing import StandardScaler
 import pickle
-
+from sklearn.impute import SimpleImputer
 # Load dataset
 df = pd.read_csv("Diabetes dataset.csv")
+
+cols_with_zero_invalid = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']
+df[cols_with_zero_invalid] = df[cols_with_zero_invalid].replace(0, np.nan)
+
+# 0s with mean vbalues 
+imputer = SimpleImputer(strategy="mean")
+df[cols_with_zero_invalid] = imputer.fit_transform(df[cols_with_zero_invalid])
+
+
 features = df.drop(columns=["Outcome"]).values
 labels = df["Outcome"].values
 
