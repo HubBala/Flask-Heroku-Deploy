@@ -59,5 +59,9 @@ y_pred = model.predict(X_test)
 
 print("Classification Report:\n", classification_report(y_test, y_pred, zero_division=1))
 
+explainer = shap.TreeExplainer(model)
+shap_values = explainer(X)
 
+np.shape(shap_values.values)
+print(shap_values.shape)
 
