@@ -1,3 +1,4 @@
+
 import json 
 import pandas as pd 
 from surprise import Reader, SVD, Dataset
@@ -6,7 +7,7 @@ import pickle
 
 with open ("datasetB_sample.json", "r") as f:
     data = json.load(f)
-'''
+
 print(data.keys())
 # View some conditions
 print("Conditions Sample:", data['Conditions'][:2])
@@ -16,7 +17,7 @@ print("Patients Sample:", data['Patients'][:2])
 
 # View some therapies
 print("Therapies Sample:", data['Therapies'][:2])
-'''
+
 
 
 # extracting the patients trial data 
@@ -58,8 +59,6 @@ with open('svd_model.pkl', 'wb') as f:
 
 df.to_csv('patient_therapy_success.csv', index=False)
 
-
-
 # sample outcome of id=0    
 example_patient_id = 0
 all_therapies = df['therapy_id'].unique()
@@ -80,3 +79,38 @@ print("Top Therapy Recommendations for Patient 0:")
 for therapy_id, score in recommended:
     print(f"Therapy: {therapy_id}, Predicted Success Score: {score:.2f}")
 
+'''
+import pandas as pd
+from sklearn.decomposition import TruncatedSVD
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+import pickle
+import json
+
+# Load your dataset
+# df = pd.read_csv('patient_therapy_success.csv')
+
+with open ("datasetB_sample.json", "r") as f:
+    data = json.load(f)
+
+# Preprocess user data
+# Assume columns: patient_id, therapy_id, success, age, gender, conditions (conditions may need to be expanded)
+print(df.columns)
+# One-hot encoding categorical columns (gender, conditions)
+df['gender_encoded'] = df['gender'].map({'male': 0, 'female': 1, 'other': 2})
+
+# Assuming you have multiple conditions, create one-hot encoding for each condition
+condition_dummies = pd.get_dummies(df['conditions'])
+df = pd.concat([df, condition_dummies], axis=1)
+
+# Now, let’s use TruncatedSVD as an example collaborative filtering model
+svd = TruncatedSVD(n_components=50)
+
+# Fit the model with patient, therapy, and user features (age, gender, conditions)
+features = ['patient_id', 'therapy_id', 'gender_encoded', 'age'] + condition_dummies.columns.tolist()
+svd.fit(df[features])
+
+# Save the trained model with the user features
+pickle.dump(svd, open('svd_model_with_user_features.pkl', 'wb'))
+'''
