@@ -1,4 +1,36 @@
 version: "3.1"
+intents:
+  - greet
+  - goodbye
+  - symptom_report
+  - ask_diagnosis
+  - ask_next_steps
+
+entities:
+  - symptom
+
+slots:
+  symptom:
+    type: list
+    influence_conversation: true
+
+responses:
+  utter_greet:
+    - text: "Hello! I’m your medical assistant. What symptoms are you experiencing?"
+
+  utter_suggest_test:
+    - text: "It's best to consult a doctor. You might also consider taking a COVID test or flu test."
+
+  utter_goodbye:
+    - text: "Take care. Wishing you a speedy recovery!"
+
+actions:
+  - action_provide_diagnosis
+
+
+
+
+version: "3.1"
 
 intents:
   - greet
