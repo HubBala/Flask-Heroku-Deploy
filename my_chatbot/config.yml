@@ -50,6 +50,9 @@
 # #     constrain_similarities: true
 
 version: "3.1"
+
+language: en
+
 pipeline:
 - name: WhitespaceTokenizer
 - name: RegexFeaturizer
