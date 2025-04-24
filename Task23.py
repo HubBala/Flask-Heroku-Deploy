@@ -80,38 +80,8 @@ for therapy_id, score in recommended:
     therapy_name = therapy_id_to_name.get(therapy_id, "Unknown Therapy")
     print(f"Therapy: {therapy_name} ({therapy_id}), Predicted Success Score: {score:.2f}")
 
-'''
-import pandas as pd
-from sklearn.decomposition import TruncatedSVD
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-import pickle
-import json
+# This SVD- Singular Value Decomposition model is a 
+# pure recommender system based on patient-therapy-success history.
+# Just like Netflix as it recommend movies based on movie rating.
 
-# Load your dataset
-# df = pd.read_csv('patient_therapy_success.csv')
 
-with open ("datasetB_sample.json", "r") as f:
-    data = json.load(f)
-
-# Preprocess user data
-# Assume columns: patient_id, therapy_id, success, age, gender, conditions (conditions may need to be expanded)
-print(df.columns)
-# One-hot encoding categorical columns (gender, conditions)
-df['gender_encoded'] = df['gender'].map({'male': 0, 'female': 1, 'other': 2})
-
-# Assuming you have multiple conditions, create one-hot encoding for each condition
-condition_dummies = pd.get_dummies(df['conditions'])
-df = pd.concat([df, condition_dummies], axis=1)
-
-# Now, let’s use TruncatedSVD as an example collaborative filtering model
-svd = TruncatedSVD(n_components=50)
-
-# Fit the model with patient, therapy, and user features (age, gender, conditions)
-features = ['patient_id', 'therapy_id', 'gender_encoded', 'age'] + condition_dummies.columns.tolist()
-svd.fit(df[features])
-
-# Save the trained model with the user features
-pickle.dump(svd, open('svd_model_with_user_features.pkl', 'wb'))
-'''

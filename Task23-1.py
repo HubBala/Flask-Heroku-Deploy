@@ -1,51 +1,84 @@
+# Task23-1.py  using the NN for the Recommendation system and a hybrid model
 import json
 import pandas as pd
-from surprise import Reader, SVD, Dataset
-from surprise.model_selection import train_test_split
+import numpy as np
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.models import load_model
+from tensorflow.keras.callbacks import EarlyStopping
 import pickle
 
-# Load the dataset
+# Load dataset
 with open("datasetB_sample.json", "r") as f:
     data = json.load(f)
 
-# Extract therapy information directly from the JSON file
-therapy_names = {therapy['id']: therapy['name'] for therapy in data['Therapies']}
+# Mapping for condition IDs to names
+condition_dict = {cond['id']: cond['name'] for cond in data['Conditions']}
 
-# Extract interaction data for training the model
-interaction_data = []
+# Build dataset
+records = []
+for patient in data["Patients"]:
+    pid = patient["id"]
+    age = patient["age"]
+    gender = patient["gender"]
+    blood_group = patient["blood_group"]
+    condition_count = len(patient["conditions"])
+    
+    for trial in patient.get("trials", []):
+        therapy_id = trial["therapy"]
+        success = trial["successful"]
+        records.append([age, gender, blood_group, therapy_id, condition_count, success])
 
-for patient in data['Patients']:
-    patient_id = patient['id']
-    trials = patient.get('trials', [])
+df = pd.DataFrame(records, columns=["age", "gender", "blood_group", "therapy_id", "condition_count", "success"])
 
-    for trial in trials:
-        therapy_id = trial['therapy']
-        success = trial['successful']
+# Encode categorical variables
+le_gender = LabelEncoder()
+le_blood = LabelEncoder()
+le_therapy = LabelEncoder()
 
-        if patient_id is not None and therapy_id and success is not None:
-            interaction_data.append([patient_id, therapy_id, success])
+df["gender_enc"] = le_gender.fit_transform(df["gender"])
+df["blood_group_enc"] = le_blood.fit_transform(df["blood_group"])
+df["therapy_cat"] = le_therapy.fit_transform(df["therapy_id"])
 
-# Converting those into a pandas DataFrame
-df = pd.DataFrame(interaction_data, columns=['patient_id', 'therapy_id', 'success'])
+# Features and target
+X = df[["age", "gender_enc", "blood_group_enc", "therapy_cat", "condition_count"]].values
+y = df["success"].values
 
-# Prepare data for the Surprise model
-reader = Reader(rating_scale=(0, 100))
-data = Dataset.load_from_df(df[['patient_id', 'therapy_id', 'success']], reader)
+# Normalize features
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
 
-# Train-test split
-trainset, testset = train_test_split(data, test_size=0.2, random_state=42)
+# Neural Network model
+model = Sequential()
+model.add(Dense(64, activation='relu', input_shape=(X_scaled.shape[1],)))
+model.add(Dropout(0.2))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(1, activation='linear'))  # Regression (predict success score)
 
-# Fit the SVD model
-model = SVD()
-model.fit(trainset)
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
 
-# Save the trained model
-with open('svd_model.pkl', 'wb') as f:
-    pickle.dump(model, f)
+early_stop = EarlyStopping(
+    monitor='val_loss', 
+    patience=5, 
+    restore_best_weights=True,
+    verbose=1
+)
 
-# Save the DataFrame as CSV for later use in the UI
-df.to_csv('patient_therapy_success.csv', index=False)
+# Train
+model.fit(X_scaled, y, epochs=30, batch_size=32, validation_split=0.2, callbacks=[early_stop])
 
-# Save the therapy names dictionary for use in the UI
-with open('therapy_names.pkl', 'wb') as f:
-    pickle.dump(therapy_names, f)
+# Save model and preprocessors
+model.save("hybrid_nn_model.h5")
+
+with open("scaler.pkl", "wb") as f:
+    pickle.dump(scaler, f)
+
+with open("label_encoders.pkl", "wb") as f:
+    pickle.dump({
+        "gender": le_gender,
+        "blood_group": le_blood,
+        "therapy": le_therapy
+    }, f)
+
+print("✅ Model and encoders saved successfully!")
