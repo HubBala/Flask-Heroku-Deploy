@@ -1,29 +1,26 @@
 version: "3.1"
+
 nlu:
-- intent: greet
-  examples: |
-    - hi
-    - hello
+  - intent: greet
+    examples: |
+      - Hello
+      - Hi there!
+      - Hey
 
-- intent: goodbye
-  examples: |
-    - bye
-    - goodbye
+  - intent: symptom_report
+    examples: |
+      - I have a headache and fever
+      - I'm coughing and my throat hurts
+      - I have chest pain and breathing difficulty
 
-- intent: symptom_report
-  examples: |
-    - I have a headache and fever
-    - I'm coughing and my throat hurts
-    - I have chest pain and breathing difficulty
-  entities:
-    - symptom
+  - intent: ask_diagnosis
+    examples: |
+      - What could this be?
+      - Do I have a cold or flu?
+      - Can you diagnose me?
 
-- intent: ask_diagnosis
-  examples: |
-    - What could it be?
-    - Can you tell me the possible disease?
-
-- intent: ask_next_steps
-  examples: |
-    - What should I do?
-    - Should I consult a doctor?
+  - intent: goodbye
+    examples: |
+      - Bye
+      - See you later
+      - Goodbye

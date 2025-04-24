@@ -13,6 +13,9 @@ slots:
   symptom:
     type: list
     influence_conversation: true
+    mappings: 
+      - type: from_entity
+        entity: symptom 
 
 responses:
   utter_greet:
