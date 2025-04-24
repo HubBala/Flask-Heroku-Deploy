@@ -51,17 +51,18 @@
 
 version: "3.1"
 pipeline:
-  - name: WhitespaceTokenizer
-  - name: RegexFeaturizer
-  - name: LexicalSyntacticFeaturizer
-  - name: CountVectorsFeaturizer
-  - name: DIETClassifier
-  - name: EntitySynonymMapper
-  - name: ResponseSelector
-  - name: FallbackClassifier
-    threshold: 0.3
+- name: WhitespaceTokenizer
+- name: RegexFeaturizer
+- name: LexicalSyntacticFeaturizer
+- name: CountVectorsFeaturizer
+- name: DIETClassifier
+- name: EntitySynonymMapper
+- name: ResponseSelector
+- name: FallbackClassifier
+  threshold: 0.3
 
 policies:
-  - name: RulePolicy
-  - name: MemoizationPolicy
-  - name: TEDPolicy
+- name: RulePolicy
+- name: MemoizationPolicy
+- name: TEDPolicy
+assistant_id: 20250424-163617-coped-block
