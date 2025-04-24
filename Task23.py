@@ -18,7 +18,7 @@ print("Patients Sample:", data['Patients'][:2])
 # View some therapies
 print("Therapies Sample:", data['Therapies'][:2])
 
-
+therapy_id_to_name = {t['id']: t['name'] for t in data['Therapies']}
 
 # extracting the patients trial data 
 interaction_data = []
@@ -60,7 +60,7 @@ with open('svd_model.pkl', 'wb') as f:
 df.to_csv('patient_therapy_success.csv', index=False)
 
 # sample outcome of id=0    
-example_patient_id = 0
+example_patient_id = 12
 all_therapies = df['therapy_id'].unique()
 
 # Recommend top-N therapies the patient hasn't tried
@@ -74,10 +74,11 @@ def get_recommendations(patient_id, n=5):
     return sorted_preds[:n]
 
 # Show top 5 therapy recommendations for patient 0
-recommended = get_recommendations(0)
-print("Top Therapy Recommendations for Patient 0:")
+recommended = get_recommendations(12)
+print("Top Therapy Recommendations for Patient 12:")
 for therapy_id, score in recommended:
-    print(f"Therapy: {therapy_id}, Predicted Success Score: {score:.2f}")
+    therapy_name = therapy_id_to_name.get(therapy_id, "Unknown Therapy")
+    print(f"Therapy: {therapy_name} ({therapy_id}), Predicted Success Score: {score:.2f}")
 
 '''
 import pandas as pd
