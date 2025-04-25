@@ -9,7 +9,7 @@ rules:
 - rule: Respond to symptom report
   steps:
   - intent: symptom_report
-  - action: utter_symptom_report
+  - action: action_provide_diagnosis
 
 - rule: Respond to diagnosis request
   steps:

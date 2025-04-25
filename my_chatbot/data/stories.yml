@@ -6,6 +6,8 @@ stories:
   - action: utter_greet
   - intent: symptom_report
   - action: action_provide_diagnosis
+  - intent: ask_diagnosis
+  - action: utter_ask_diagnosis
   - intent: ask_next_steps
   - action: utter_suggest_test
   - intent: goodbye
