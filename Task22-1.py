@@ -1,3 +1,5 @@
+# reinforcement learning using Q-Table
+
 import numpy as np
 import pandas as pd
 import random

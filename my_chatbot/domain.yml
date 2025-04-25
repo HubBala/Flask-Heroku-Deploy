@@ -10,7 +10,7 @@ entities:
   - symptom
 
 slots:
-  symptom:
+  symptom: 
     type: list
     influence_conversation: true
     mappings: 
@@ -23,6 +23,9 @@ responses:
 
   utter_suggest_test:
     - text: "It's best to consult a doctor. You might also consider taking a COVID test or flu test."
+  
+  utter_ask_diagnosis:
+    - text: "Based on your symptoms, you might have a mild infection. Please consult a doctor for confirmation."
 
   utter_goodbye:
     - text: "Take care. Wishing you a speedy recovery!"

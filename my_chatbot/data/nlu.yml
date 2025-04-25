@@ -9,9 +9,9 @@ nlu:
 
   - intent: symptom_report
     examples: |
-      - I have a headache and fever
-      - I'm coughing and my throat hurts
-      - I have chest pain and breathing difficulty
+      - I have a [headache](symptom) and [fever](symptom)
+      - I'm [coughing](symptom) and my [throat hurts](symptom)
+      - I have [chest pain](symptom) and [breathing difficulty](symptom)
 
   - intent: ask_diagnosis
     examples: |
