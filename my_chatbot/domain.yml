@@ -1,9 +1,14 @@
 version: "3.1"
+
 intents:
   - greet
   - goodbye
   - symptom_report
   - ask_diagnosis
+  - ask_treatment
+  - ask_prevention
+  - ask_condition_info
+  - ask_general_health
   - ask_next_steps
 
 entities:
@@ -19,19 +24,35 @@ slots:
 
 responses:
   utter_greet:
-    - text: "Hello! I’m your medical assistant. What symptoms are you experiencing?"
+    - text: "Hi there! I'm your health assistant. How can I help you today?"
+
+  utter_symptom_report:
+    - text: "It sounds like you're experiencing multiple symptoms. Please consult a doctor for a professional diagnosis."
+
+  utter_ask_diagnosis:
+    - text: "Based on your symptoms, you might be dealing with a common condition, but it's best to get checked by a doctor."
+
+  utter_ask_treatment:
+    - text: "Treatment depends on the condition. Can you specify your symptoms or the issue you're facing?"
+
+  utter_ask_prevention:
+    - text: "Maintaining hygiene, a healthy lifestyle, and good nutrition can help prevent many illnesses."
+
+  utter_ask_condition_info:
+    - text: "That's a great question. I can provide general info, but for a full explanation, consider speaking with a healthcare professional."
+
+  utter_ask_general_health:
+    - text: "A healthy lifestyle includes exercise, proper diet, hydration, sleep, and stress management."
 
   utter_suggest_test:
-    - text: "It's best to consult a doctor. You might also consider taking a COVID test or flu test."
-  
-  utter_ask_diagnosis:
-    - text: "Based on your symptoms, you might have a mild infection. Please consult a doctor for confirmation."
+    - text: "Based on your symptoms, you should consider seeing a doctor for further testing."
 
   utter_goodbye:
     - text: "Take care. Wishing you a speedy recovery!"
 
 actions:
   - action_provide_diagnosis
+
 
 
 

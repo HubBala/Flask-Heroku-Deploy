@@ -38,10 +38,11 @@ class ActionProvideDiagnosis(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        user_message = tracker.latest_message.get("text")
-        symptoms = [e['value'] for e in tracker.latest_message['entities'] if e['entity'] == 'symptom']
+        symptoms = [e['value'].lower() for e in tracker.latest_message.get("entities", []) if e['entity'] == 'symptom']
 
-        if "fever" in symptoms and "cough" in symptoms:
+        if not symptoms:
+            diagnosis = "I couldn't detect any symptoms. Can you describe how you're feeling in more detail?"
+        elif "fever" in symptoms and "cough" in symptoms:
             diagnosis = "You may have a viral infection like the flu or COVID-19."
         elif "headache" in symptoms and "nausea" in symptoms:
             diagnosis = "It could be a migraine."
