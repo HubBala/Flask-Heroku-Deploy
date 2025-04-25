@@ -52,6 +52,12 @@ responses:
 
 actions:
   - action_provide_diagnosis
+  - action_provide_tretment
+  - action_provide_prevention
+  - action_provide_condition_info
+  - action_provide_general_health
+  - action_suggest_next_steps
+  
 
 
 
